@@ -185,7 +185,7 @@ function renderHome(){
   renderStars();
   show("home");
 }
-function goHome(){ speechSynthesis.cancel(); renderHome(); }
+function goHome(){ stopAudio(); renderHome(); }
 
 /* ---------- flashcards ---------- */
 function startStudy(ci){ curCat = ci; curIdx = 0; renderCard(); show("study"); }
@@ -207,14 +207,26 @@ function nextCard(){ curIdx = (curIdx+1) % DATA[curCat].words.length; renderCard
 function prevCard(){ curIdx = (curIdx-1+DATA[curCat].words.length) % DATA[curCat].words.length; renderCard(); speakCur(); }
 
 /* ---------- speech ----------
-   Pre-recorded studio-quality clips (audio/ci_wi.mp3, male voice, slow pace).
-   Falls back to the device's built-in Korean voice if a clip can't load. */
-let player = null;
-function speakWord(ci, wi){
+   Pre-recorded studio-quality clips, played as a call-and-response pair:
+   female voice first (audio/f_ci_wi.mp3), then the male voice repeats
+   (audio/ci_wi.mp3). Device TTS is the last-resort fallback. */
+let player = null, echo = null;
+function stopAudio(){
   speechSynthesis.cancel();
   if (player) { player.pause(); player = null; }
-  player = new Audio(`audio/${ci}_${wi}.mp3`);
-  player.play().catch(() => speakFallback(DATA[ci].words[wi].ko));
+  if (echo) { clearTimeout(echo); echo = null; }
+}
+function speakWord(ci, wi){
+  stopAudio();
+  const female = new Audio(`audio/f_${ci}_${wi}.mp3`);
+  const male = new Audio(`audio/${ci}_${wi}.mp3`);
+  const repeat = () => { player = male; echo = setTimeout(() => male.play().catch(()=>{}), 250); };
+  player = female;
+  female.onended = repeat;
+  female.play().catch(() => {
+    player = male;
+    male.play().catch(() => speakFallback(DATA[ci].words[wi].ko));
+  });
 }
 function speakFallback(text){
   const u = new SpeechSynthesisUtterance(text);
