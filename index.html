@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Korean Wordy Buddy — Learn Your First 100 Korean Words (Free)</title>
+<meta name="description" content="Free interactive flashcards and quizzes for your first 100 Korean words. Real Korean audio, no ads, no sign-up.">
+<style>
+  :root{
+    --bg:#fff8ef; --card:#ffffff; --ink:#3a3345; --sub:#8b8098;
+    --accent:#ff7a59; --accent2:#7c5cff; --good:#2fbf71; --bad:#ff5c7a;
+    --shadow:0 6px 20px rgba(58,51,69,.10);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+  .wrap{max-width:560px;margin:0 auto;padding:20px 16px 60px}
+  header{text-align:center;padding:18px 0 8px}
+  header h1{font-size:1.7rem;letter-spacing:-.5px}
+  header p{color:var(--sub);margin-top:6px;font-size:.95rem}
+  .stars{display:inline-block;margin-top:10px;background:#fff;border-radius:999px;padding:6px 14px;box-shadow:var(--shadow);font-weight:700;font-size:.9rem}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+  .cat{background:var(--card);border:none;border-radius:18px;padding:18px 12px;text-align:center;cursor:pointer;box-shadow:var(--shadow);transition:transform .12s}
+  .cat:active{transform:scale(.96)}
+  .cat .em{font-size:2rem}
+  .cat .nm{font-weight:800;margin-top:6px;font-size:.95rem}
+  .cat .done{font-size:.75rem;color:var(--sub);margin-top:4px}
+  .hidden{display:none!important}
+  .topbar{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+  .btn{border:none;border-radius:14px;padding:12px 18px;font-size:1rem;font-weight:800;cursor:pointer;box-shadow:var(--shadow)}
+  .btn.ghost{background:#fff;color:var(--ink)}
+  .btn.main{background:var(--accent);color:#fff}
+  .btn.purple{background:var(--accent2);color:#fff}
+  .btn:active{transform:scale(.97)}
+  .card{background:var(--card);border-radius:24px;box-shadow:var(--shadow);padding:34px 20px;text-align:center;margin-top:16px;cursor:pointer;user-select:none}
+  .card .em{font-size:4rem}
+  .card .ko{font-size:2.6rem;font-weight:900;margin-top:10px}
+  .card .ro{color:var(--sub);font-size:1.05rem;margin-top:4px}
+  .card .en{font-size:1.3rem;font-weight:700;color:var(--accent2);margin-top:12px;min-height:1.6rem}
+  .card .hint{color:var(--sub);font-size:.8rem;margin-top:14px}
+  .navrow{display:flex;gap:10px;justify-content:center;margin-top:16px}
+  .count{color:var(--sub);font-weight:700;align-self:center}
+  .speak{background:var(--accent2);color:#fff;border:none;border-radius:50%;width:52px;height:52px;font-size:1.4rem;cursor:pointer;box-shadow:var(--shadow);margin-top:14px}
+  .choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+  .choices button{background:#fff;border:3px solid transparent;border-radius:16px;padding:16px 8px;font-size:1.05rem;font-weight:800;cursor:pointer;box-shadow:var(--shadow)}
+  .choices button.correct{border-color:var(--good);background:#e9fff3}
+  .choices button.wrong{border-color:var(--bad);background:#ffeef1}
+  .qword{font-size:2.4rem;font-weight:900;text-align:center;margin-top:8px}
+  .feedback{text-align:center;font-size:1.2rem;font-weight:900;margin-top:14px;min-height:1.6rem}
+  .result{background:#fff;border-radius:24px;box-shadow:var(--shadow);padding:34px 20px;text-align:center;margin-top:20px}
+  .result .big{font-size:3rem}
+  .result h2{margin-top:8px}
+  .result p{color:var(--sub);margin-top:6px}
+  .promo{background:linear-gradient(135deg,#7c5cff,#ff7a59);border-radius:24px;color:#fff;padding:26px 20px;text-align:center;margin-top:34px}
+  .promo h3{font-size:1.2rem}
+  .promo p{font-size:.92rem;margin-top:8px;opacity:.94;line-height:1.5}
+  .promo a{display:inline-block;margin-top:14px;background:#fff;color:var(--accent2);text-decoration:none;font-weight:900;border-radius:14px;padding:12px 20px}
+  .promo .songs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:4px}
+  .promo .songs a{margin-top:6px;padding:9px 14px;font-size:.85rem;font-weight:800;color:#2a7a94}
+  footer{text-align:center;color:var(--sub);font-size:.8rem;margin-top:30px;line-height:1.6}
+  footer a{color:var(--sub)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>⭐ Korean Wordy Buddy</h1>
+    <p>Learn your first 100 Korean words. Free, no ads, no sign-up.</p>
+    <div class="stars">⭐ <span id="starCount">0</span> stars earned</div>
+  </header>
+
+  <!-- category grid -->
+  <div id="home">
+    <div class="grid" id="catGrid"></div>
+  </div>
+
+  <!-- flashcards -->
+  <div id="study" class="hidden">
+    <div class="topbar">
+      <button class="btn ghost" onclick="goHome()">← Back</button>
+      <span class="count" id="studyCount"></span>
+      <button class="btn purple" onclick="startQuiz(curCat)">Quiz me!</button>
+    </div>
+    <div class="card" id="flashcard" onclick="flipCard()">
+      <div class="em" id="fEm"></div>
+      <div class="ko" id="fKo"></div>
+      <div class="ro" id="fRo"></div>
+      <div class="en" id="fEn"></div>
+      <div class="hint">tap card to reveal English · tap 🔊 to hear it</div>
+    </div>
+    <div style="text-align:center"><button class="speak" onclick="speakCur(event)">🔊</button></div>
+    <div class="navrow">
+      <button class="btn ghost" onclick="prevCard()">← Prev</button>
+      <button class="btn main" onclick="nextCard()">Next →</button>
+    </div>
+  </div>
+
+  <!-- quiz -->
+  <div id="quiz" class="hidden">
+    <div class="topbar">
+      <button class="btn ghost" onclick="goHome()">← Quit</button>
+      <span class="count" id="quizCount"></span>
+    </div>
+    <div class="card" style="cursor:default">
+      <div class="qword" id="qKo"></div>
+      <div class="ro" id="qRo"></div>
+      <div style="text-align:center"><button class="speak" onclick="speakQuiz()">🔊</button></div>
+      <div class="choices" id="choices"></div>
+      <div class="feedback" id="feedback"></div>
+    </div>
+  </div>
+
+  <!-- quiz result -->
+  <div id="result" class="hidden">
+    <div class="result">
+      <div class="big" id="rEmoji"></div>
+      <h2 id="rTitle"></h2>
+      <p id="rText"></p>
+      <div class="navrow">
+        <button class="btn ghost" onclick="goHome()">Home</button>
+        <button class="btn main" id="retryBtn">Try again</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="promo">
+    <h3>📘 Want the full picture book?</h3>
+    <p>Korean Wordy Buddy: illustrated ebooks with beautiful labeled scenes of Korean daily life, printable flashcards, and hundreds more words.</p>
+    <a id="buyLink" href="GUMROAD_URL" target="_blank" rel="noopener">Get the ebook →</a>
+  </div>
+
+  <div class="promo" style="background:linear-gradient(135deg,#38b6d8,#7c5cff);margin-top:14px">
+    <h3>🎵 Learn with songs</h3>
+    <p>These words pair with original Korean learning songs by OKTAV MUSIC, on Spotify, YouTube Music, and everywhere else. Some are brand new... tap to stream or pre-save.</p>
+    <div class="songs">
+      <a href="https://ditto.fm/ganada-song-kids-ver" target="_blank" rel="noopener">Ganada Song (Kids Ver.)</a>
+      <a href="https://ditto.fm/ganada-song-pop-version" target="_blank" rel="noopener">Ganada Song (Pop Ver.)</a>
+      <a href="https://ditto.fm/hello-and-thank-you" target="_blank" rel="noopener">Hello &amp; Thank You</a>
+      <a href="https://ditto.fm/i-love-you-salanghaeyo" target="_blank" rel="noopener">I Love You (사랑해요)</a>
+      <a href="https://ditto.fm/color-song-saegkkalsong" target="_blank" rel="noopener">Color Song (색깔송)</a>
+      <a href="https://ditto.fm/hello-song-insasong" target="_blank" rel="noopener">Hello Song (인사송)</a>
+      <a href="https://ditto.fm/animal-song-dongmulsong" target="_blank" rel="noopener">Animal Song (동물송)</a>
+      <a href="https://ditto.fm/body-song-momsong" target="_blank" rel="noopener">Body Song (몸송)</a>
+      <a href="https://ditto.fm/feelings-song-gamjeongsong" target="_blank" rel="noopener">Feelings Song (감정송)</a>
+      <a href="https://ditto.fm/days-song-yoilsong" target="_blank" rel="noopener">Days Song (요일송)</a>
+      <a href="https://ditto.fm/food-song-eumsigsong" target="_blank" rel="noopener">Food Song (음식송)</a>
+      <a href="https://ditto.fm/family-song-gajogsong" target="_blank" rel="noopener">Family Song (가족송)</a>
+      <a href="https://ditto.fm/number-song-susjasong" target="_blank" rel="noopener">Number Song (숫자송)</a>
+    </div>
+  </div>
+
+  <footer>
+    Made with ❤️ for everyone learning Korean.<br>
+    Open source on <a href="https://github.com/miheehwang0229-maker/korean-wordy-buddy" target="_blank" rel="noopener">GitHub</a> · Audio uses your device's Korean voice.
+  </footer>
+</div>
+
+<script src="words.js"></script>
+<script>
+let curCat = 0, curIdx = 0, flipped = false;
+let qOrder = [], qPos = 0, qScore = 0, qLock = false;
+
+const stars = () => parseInt(localStorage.getItem("wb_stars") || "0");
+const addStars = n => { localStorage.setItem("wb_stars", stars() + n); renderStars(); };
+const bestKey = c => "wb_best_" + c;
+function renderStars(){ document.getElementById("starCount").textContent = stars(); }
+
+function show(id){
+  ["home","study","quiz","result"].forEach(x => document.getElementById(x).classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
+}
+
+function renderHome(){
+  const g = document.getElementById("catGrid");
+  g.innerHTML = "";
+  DATA.forEach((c,i)=>{
+    const best = localStorage.getItem(bestKey(i));
+    const b = document.createElement("button");
+    b.className = "cat";
+    b.innerHTML = `<div class="em">${c.emoji}</div><div class="nm">${c.category}</div>
+      <div class="done">${best ? "🏆 best: " + best + "/10" : c.words.length + " words"}</div>`;
+    b.onclick = () => startStudy(i);
+    g.appendChild(b);
+  });
+  renderStars();
+  show("home");
+}
+function goHome(){ speechSynthesis.cancel(); renderHome(); }
+
+/* ---------- flashcards ---------- */
+function startStudy(ci){ curCat = ci; curIdx = 0; renderCard(); show("study"); }
+function renderCard(){
+  const w = DATA[curCat].words[curIdx];
+  flipped = false;
+  document.getElementById("fEm").textContent = w.e;
+  document.getElementById("fKo").textContent = w.ko;
+  document.getElementById("fRo").textContent = w.ro;
+  document.getElementById("fEn").textContent = "";
+  document.getElementById("studyCount").textContent = (curIdx+1) + " / " + DATA[curCat].words.length;
+}
+function flipCard(){
+  const w = DATA[curCat].words[curIdx];
+  flipped = !flipped;
+  document.getElementById("fEn").textContent = flipped ? w.en : "";
+}
+function nextCard(){ curIdx = (curIdx+1) % DATA[curCat].words.length; renderCard(); speakCur(); }
+function prevCard(){ curIdx = (curIdx-1+DATA[curCat].words.length) % DATA[curCat].words.length; renderCard(); speakCur(); }
+
+/* ---------- speech ---------- */
+function speak(text){
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "ko-KR"; u.rate = 0.85;
+  const ko = speechSynthesis.getVoices().find(v => v.lang && v.lang.startsWith("ko"));
+  if (ko) u.voice = ko;
+  speechSynthesis.speak(u);
+}
+function speakCur(ev){ if(ev) ev.stopPropagation(); speak(DATA[curCat].words[curIdx].ko); }
+function speakQuiz(){ speak(DATA[curCat].words[qOrder[qPos]].ko); }
+speechSynthesis.getVoices(); // warm up voice list
+
+/* ---------- quiz ---------- */
+function startQuiz(ci){
+  curCat = ci; qScore = 0; qPos = 0; qLock = false;
+  qOrder = [...DATA[ci].words.keys()].sort(() => Math.random() - .5);
+  renderQuiz(); show("quiz");
+}
+function renderQuiz(){
+  const words = DATA[curCat].words, w = words[qOrder[qPos]];
+  document.getElementById("qKo").textContent = w.e + " " + w.ko;
+  document.getElementById("qRo").textContent = w.ro;
+  document.getElementById("quizCount").textContent = (qPos+1) + " / " + words.length + "  ·  ✅ " + qScore;
+  document.getElementById("feedback").textContent = "";
+  const wrong = words.filter(x => x.en !== w.en).sort(() => Math.random() - .5).slice(0,3);
+  const opts = [w, ...wrong].sort(() => Math.random() - .5);
+  const box = document.getElementById("choices");
+  box.innerHTML = ""; qLock = false;
+  opts.forEach(o => {
+    const b = document.createElement("button");
+    b.textContent = o.en;
+    b.onclick = () => pick(b, o.en === w.en);
+    box.appendChild(b);
+  });
+  speak(w.ko);
+}
+function pick(btn, ok){
+  if (qLock) return; qLock = true;
+  btn.classList.add(ok ? "correct" : "wrong");
+  document.getElementById("feedback").textContent = ok ? "🎉 Great job!" : "💪 Almost! Keep going!";
+  if (ok) { qScore++; addStars(1); }
+  setTimeout(() => {
+    qPos++;
+    if (qPos < DATA[curCat].words.length) renderQuiz();
+    else finishQuiz();
+  }, 900);
+}
+function finishQuiz(){
+  const total = DATA[curCat].words.length;
+  const prev = parseInt(localStorage.getItem(bestKey(curCat)) || "0");
+  if (qScore > prev) localStorage.setItem(bestKey(curCat), qScore);
+  const perfect = qScore === total;
+  document.getElementById("rEmoji").textContent = perfect ? "🏆" : qScore >= total*0.7 ? "🌟" : "💪";
+  document.getElementById("rTitle").textContent = perfect ? "Perfect score!" : qScore + " out of " + total + "!";
+  document.getElementById("rText").textContent = perfect
+    ? "You mastered " + DATA[curCat].category + "! +" + total + " stars"
+    : "Practice the cards and try again for a perfect score.";
+  document.getElementById("retryBtn").onclick = () => startQuiz(curCat);
+  show("result");
+}
+
+renderHome();
+</script>
+</body>
+</html>
