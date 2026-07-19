@@ -206,17 +206,25 @@ function flipCard(){
 function nextCard(){ curIdx = (curIdx+1) % DATA[curCat].words.length; renderCard(); speakCur(); }
 function prevCard(){ curIdx = (curIdx-1+DATA[curCat].words.length) % DATA[curCat].words.length; renderCard(); speakCur(); }
 
-/* ---------- speech ---------- */
-function speak(text){
+/* ---------- speech ----------
+   Pre-recorded studio-quality clips (audio/ci_wi.mp3, male voice, slow pace).
+   Falls back to the device's built-in Korean voice if a clip can't load. */
+let player = null;
+function speakWord(ci, wi){
   speechSynthesis.cancel();
+  if (player) { player.pause(); player = null; }
+  player = new Audio(`audio/${ci}_${wi}.mp3`);
+  player.play().catch(() => speakFallback(DATA[ci].words[wi].ko));
+}
+function speakFallback(text){
   const u = new SpeechSynthesisUtterance(text);
-  u.lang = "ko-KR"; u.rate = 0.85;
+  u.lang = "ko-KR"; u.rate = 0.7;
   const ko = speechSynthesis.getVoices().find(v => v.lang && v.lang.startsWith("ko"));
   if (ko) u.voice = ko;
   speechSynthesis.speak(u);
 }
-function speakCur(ev){ if(ev) ev.stopPropagation(); speak(DATA[curCat].words[curIdx].ko); }
-function speakQuiz(){ speak(DATA[curCat].words[qOrder[qPos]].ko); }
+function speakCur(ev){ if(ev) ev.stopPropagation(); speakWord(curCat, curIdx); }
+function speakQuiz(){ speakWord(curCat, qOrder[qPos]); }
 speechSynthesis.getVoices(); // warm up voice list
 
 /* ---------- quiz ---------- */
@@ -241,7 +249,7 @@ function renderQuiz(){
     b.onclick = () => pick(b, o.en === w.en);
     box.appendChild(b);
   });
-  speak(w.ko);
+  speakWord(curCat, qOrder[qPos]);
 }
 function pick(btn, ok){
   if (qLock) return; qLock = true;
