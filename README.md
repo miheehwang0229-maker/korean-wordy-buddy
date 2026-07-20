@@ -15,7 +15,7 @@ No ads. No sign-up. No tracking. Works on any phone or computer.
 
 ## Why
 
-My kids grew up outside Korea. Every app we tried was either full of ads or locked behind a subscription just to learn the word for "spoon." So we made this and gave it away.
+This started as a project for kids in our family growing up outside Korea... then we realized every beginner has the same problem: apps full of ads, or a subscription just to learn the word for "spoon." So we made this and gave it away.
 
 ## Run it yourself
 
